@@ -11,22 +11,30 @@ const fs = require('fs-extra');
 
 module.exports = {
 
-    getDeleteUsers: async (req, res) => { //Obtenemos todos los usuarios inactivos
-        const persona = await pool.query('SELECT * FROM PERSONA, DIRECCION WHERE PERSONA.DIRECCION_ID = DIRECCION.DIRECCION_ID AND PERSONA_ESTADO = "ELIMINADO"');
-        res.render('administrator/users', { persona });
+    activeUserGet: async (req, res) => { //Obtenemos todos los usuarios inactivos
+        var noUser = false;
+        res.render('administrator/users', { noUser });
     },
 
-    searchDeleteUsers: async (req, res) => { //Buscar usuarios por su nombre
+    activeUserSearch: async (req, res) => { //Buscar usuarios por su nombre
         const { buscar } = req.query;
+        var noUser = false;
+
         if (buscar) {
-            const persona = await pool.query('SELECT * FROM PERSONA, DIRECCION, ROL WHERE PERSONA.DIRECCION_ID = DIRECCION.DIRECCION_ID AND PERSONA.ROL_ID = ROL.ROL_ID AND PERSONA_ESTADO = "ELIMINADO" AND PERSONA_NOMBRE =  ?', [buscar]);
-            res.render('administrator/users', { persona });
+            const persona = await pool.query('SELECT * FROM PERSONA, DIRECCION WHERE PERSONA.DIRECCION_ID = DIRECCION.DIRECCION_ID AND PERSONA_ESTADO = "ELIMINADO" AND PERSONA_NOMBRE =  ?', [buscar]);
+
+            if (persona.length == 0) {
+                noUser = true;
+            }
+
+            res.render('administrator/users', { persona, noUser });
         } else {
-            res.render('administrator/users');
+            noUser = true;
+            res.render('administrator/users', { noUser });
         }
     },
 
-    activeUser: async (req, res) => { //Activamos usuario por su ID
+    activeUserPost: async (req, res) => { //Activamos usuario por su ID
         const { id } = req.params;
         console.log('id usuario: ' + id);
         var today = new Date();
@@ -35,33 +43,84 @@ module.exports = {
         const userLogin = loginDate + ' ' + loginHour;
 
         await pool.query('UPDATE PERSONA SET PERSONA_ESTADO = "ACTIVO", PERSONA_LOGIN = ? WHERE PERSONA.PERSONA_ID = ?', [userLogin, id]);
-        req.flash('success', 'Usuario Activado');
+
+        const rows = await pool.query('SELECT * FROM PERSONA WHERE PERSONA_ID = ?', [id]);
+        const user = rows[0];
+
+        req.flash('success', 'La cuenta del usuario ' + user.PERSONA_NOMBRE + ' está activado');
         res.redirect('/administrator/users');
     },
 
     // ------------------------------------------------------------------------------------------------------
+    // DAR PERMISOS DE ADMINISTRADOR
     // ------------------------------------------------------------------------------------------------------
-    getAllUsers: async (req, res) => { //Obtenemos pagina de admin
-        res.render('administrator/addAdmin');
+    activeAdminGet: async (req, res) => { //Obtenemos pagina de admin
+        var noUser = false;
+        res.render('administrator/addAdmin', { noUser });
     },
 
-    getSearchUsers: async (req, res) => { //Buscar usuarios por su nombre
+    activeAdminSearch: async (req, res) => { //Buscar usuarios por su nombre
         const { buscar } = req.query;
+        var noUser = false;
+
         if (buscar) {
-            const persona = await pool.query('SELECT * FROM PERSONA, DIRECCION, ROL WHERE PERSONA.DIRECCION_ID = DIRECCION.DIRECCION_ID AND PERSONA.ROL_ID = ROL.ROL_ID AND PERSONA_ESTADO = "ACTIVO" AND PERSONA_NOMBRE =  ?', [buscar]);
-            res.render('administrator/addAdmin', { persona });
+            const persona = await pool.query('SELECT * FROM PERSONA, DIRECCION WHERE PERSONA.DIRECCION_ID = DIRECCION.DIRECCION_ID AND PERSONA.ROL_ID = 2 AND PERSONA_ESTADO = "ACTIVO" AND PERSONA_NOMBRE =  ?', [buscar]);
+
+            if (persona.length == 0) {
+                noUser = true;
+            }
+
+            res.render('administrator/addAdmin', { persona, noUser });
         } else {
-            res.render('administrator/addAdmin');
+            noUser = true;
+            res.render('administrator/addAdmin', { persona, noUser });
         }
     },
-
-    activeAdmin: async (req, res) => { //Activamos usuario por su ID
+    
+    activeAdminPost: async (req, res) => { //Activamos usuario por su ID
         const { id } = req.params;
         await pool.query('UPDATE PERSONA SET ROL_ID = 1 WHERE PERSONA.PERSONA_ID = ?', [id]);
         const rows = await pool.query('SELECT PERSONA_NOMBRE FROM PERSONA WHERE PERSONA_ID = ?', [id]);
         const persona = rows[0].PERSONA_NOMBRE;
-        req.flash('success', 'El usuario ' + persona +' ahora posee permisos de administrador');
+        req.flash('success', 'El usuario ' + persona + ' ahora posee permisos de administrador');
         res.redirect('/administrator/addAdmin');
+    },
+    // ------------------------------------------------------------------------------------------------------
+    // ELIMINAR USUARIO
+    // ------------------------------------------------------------------------------------------------------
+    deleteUserGet: async (req, res) => { //Obtenemos pagina de admin
+        var noUser = false;
+        res.render('administrator/deleteUser', { noUser });
+    },
+
+    deleteUserSearch: async (req, res) => { //Buscar usuarios por su nombre
+        const { buscar } = req.query;
+        var noUser = false;
+
+        if (buscar) {
+            const persona = await pool.query('SELECT * FROM PERSONA, DIRECCION WHERE PERSONA.DIRECCION_ID = DIRECCION.DIRECCION_ID AND PERSONA_ESTADO = "ACTIVO" AND PERSONA_NOMBRE =  ?', [buscar]);
+
+            if (persona.length == 0) {
+                noUser = true;
+            }
+
+            res.render('administrator/deleteUser', { persona, noUser });
+        } else {
+            noUser = true;
+            res.render('administrator/deleteUser', { persona, noUser });
+        }
+    },
+
+    deleteUserPost: async (req, res) => { //Activamos usuario por su ID
+        const { id } = req.params;
+        console.log(id);
+        await pool.query('UPDATE PERSONA SET PERSONA_ESTADO = "ELIMINADO" WHERE PERSONA.PERSONA_ID = ?', [id]);
+        await pool.query('UPDATE PRODUCTO SET PRODUCTO_ESTADO = "ELIMINADO" WHERE PRODUCTO.PERSONA_ID = ?', [id]);
+        // UPDATE `producto` SET `PRODUCTO_ESTADO` = 'ELIMINADO' WHERE `producto`.`PRODUCTO_ID` = 2;
+        const rows = await pool.query('SELECT PERSONA_NOMBRE FROM PERSONA WHERE PERSONA_ID = ?', [id]);
+        const persona = rows[0].PERSONA_NOMBRE;
+        req.flash('success', 'El usuario ' + persona + ' ahora se encuntra eliminado');
+        res.redirect('/administrator/addUser');
     },
     // ------------------------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------------------------

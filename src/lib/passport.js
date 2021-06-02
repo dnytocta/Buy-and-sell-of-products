@@ -23,7 +23,7 @@ passport.use('local.signin', new LocalStrategy({//Esto es para el login
         const user = rows[0];
         const passMd5 = md5(password);
 
-        if (user.PERSONA_ESTADO == 'PASIVO' || user.PERSONA_ESTADO == 'POR_APROBAR') {
+        if (user.PERSONA_ESTADO == 'ELIMINADO' || user.PERSONA_ESTADO == 'POR_APROBAR') {
             return done(null, false, req.flash('message', 'Su cuenta está desactivada'));
         }
 

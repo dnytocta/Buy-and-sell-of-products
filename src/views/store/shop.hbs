@@ -138,20 +138,20 @@
                                         </h3>
                                         <img src="{{PRODUCTO_URL}}" class="card-img-top" width="90px" height="150px">
                                         <p class="m-2">Precio: <label class="text-danger">$ Oferta</label></p>
-                                        <p class="m-2">Cantidad Disponible: {{PRODUCTO_CANTIDAD}}</p>
+                                        <p class="m-2">Cantidad Disponible: {{PRODUCTO_CANTIDAD}} ({{PRESENTACION_NOMBRE}})</p>
                                         <p class="m-2">Dirección: {{PARROQUIA}}</p>
 
                                         {{!-- --}}
                                         <!-- Button trigger modal -->
                                         <div class="d-grid gap-3">
                                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#myModal{{@index}}">
+                                                data-bs-target="#myModalProduct{{@index}}">
                                                 Ver Producto
                                             </button>
                                         </div>
 
                                         <!-- Modal -->
-                                        <div class="modal fade" id="myModal{{@index}}" tabindex="-1"
+                                        <div class="modal fade" id="myModalProduct{{@index}}" tabindex="-1"
                                             aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered">
                                                 <div class="modal-content">
@@ -220,20 +220,20 @@
                                         </h3>
                                         <img src="{{PRODUCTO_URL}}" class="card-img-top" width="90px" height="150px">
                                         <p class="m-2">Precio: $ {{PRODUCTO_PRECIO}}</p>
-                                        <p class="m-2">Cantidad Disponible: {{PRODUCTO_CANTIDAD}}</p>
+                                        <p class="m-2">Cantidad Disponible: {{PRODUCTO_CANTIDAD}} ({{PRESENTACION_NOMBRE}})</p>
                                         <p class="m-2">Dirección: {{PARROQUIA}}</p>
 
                                         {{!-- --}}
                                         <!-- Button trigger modal -->
                                         <div class="d-grid gap-3">
                                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#myModal{{@index}}">
+                                                data-bs-target="#myModalOffer{{@index}}">
                                                 Ver Producto
                                             </button>
                                         </div>
 
                                         <!-- Modal -->
-                                        <div class="modal fade" id="myModal{{@index}}" tabindex="-1"
+                                        <div class="modal fade" id="myModalOffer{{@index}}" tabindex="-1"
                                             aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered">
                                                 <div class="modal-content">
