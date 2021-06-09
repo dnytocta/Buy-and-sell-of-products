@@ -34,7 +34,7 @@ module.exports = {
         doc
             .fillColor("#444444")
             .fontSize(20)
-            .text("Red De Profesionales De Cotopaxi", 50, 57)
+            .text("Compra y Venta de productos agricolas", 50, 57)
             .fontSize(10)
             .font("Helvetica-Bold")
             .text("Fecha de compra:", 400, 65)
