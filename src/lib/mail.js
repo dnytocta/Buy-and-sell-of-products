@@ -1,8 +1,8 @@
 const nodemailer = require('nodemailer');
 
 const mail = {
-    user: 'cotopaxisalesiana@gmail.com',
-    pass: 'vuoqjbtniywcwujo'
+    user: process.env.EMAIL_USERNAME,
+    pass: process.env.EMAIL_PASSWORD
 }
 
 let transporter = nodemailer.createTransport({
@@ -22,7 +22,7 @@ const getTemplate = (name, link) => {
       </head>
       
       <div id="email___content">      
-        <h2>Red De Profesionales De Cotopaxi</h2>
+        <h2>Compra Ventas de productos agricolas</h2>
         <h3>Hola ${name}</h3>
         <p>
         Confirmar cuenta,
@@ -36,7 +36,7 @@ const sendEmail = async (email, subject, html) => {
     try {
 
         await transporter.sendMail({
-            from: `CotopaxiUps <${mail.user}>`, // sender address
+            from: `Plataforma web UPS <${mail.user}>`, // sender address
             to: email, // list of receivers
             subject, // Subject line
             text: "Validación del token", // plain text body
